@@ -20,4 +20,5 @@ export class UserRegistrationService {
     return this.userRegistrationRepository.findOne({where:{id}})
   }
 
+
 }

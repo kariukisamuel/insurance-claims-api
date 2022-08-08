@@ -14,6 +14,7 @@ import { AuthDTO } from './auth.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginDTO } from './login.dto';
+import { ResetPasswordDTO } from './reset-password.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -82,4 +83,15 @@ export class AuthController {
   login(@Body() loginDTO: LoginDTO) {
     return this.authService.login(loginDTO);
   }
+
+  @Post('reset-password')
+  @ApiOperation({
+    summary:
+      'Reset Password Via Email.',
+  })
+  resetPassword(@Body() resetPasswordDTO: ResetPasswordDTO ){
+    return this.authService.resetPassword(resetPasswordDTO)
+  }
+  
+
 }

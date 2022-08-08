@@ -13,6 +13,7 @@ import { Repository } from 'typeorm';
 import { AuthDTO } from './auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { ResetPasswordDTO } from './reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -70,15 +71,19 @@ export class AuthService {
     user.status = true;
     return this.authRepository.save(user);
   }
-
+  async checkUserByEmail(email: string) {
+    const user = await this.authRepository.findOneBy({
+      business_email: email,
+    });
+    return user;
+  }
   async signUp(@Body() authDTO: AuthDTO) {
     console.log(authDTO.password);
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(authDTO.password, saltOrRounds);
     authDTO.password = hash;
-    const user = await this.authRepository.findOneBy({
-      business_email: authDTO.business_email,
-    });
+    const user = await this.checkUserByEmail(authDTO.business_email);
+
     if (authDTO.register_token === user.register_token) {
       authDTO.register_token = null;
       return this.authRepository.update(user.id, authDTO);
@@ -89,6 +94,28 @@ export class AuthService {
           error: 'The link has expired',
         },
         HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  async resetPassword(resetPasswordDTO: ResetPasswordDTO) {
+    const user = await this.checkUserByEmail(resetPasswordDTO.business_email);
+    if (user) {
+      const reset_password_token: string = uuidv4();
+      await this.authRepository
+        .createQueryBuilder()
+        .update(Auth)
+        .set({ reset_password_token: reset_password_token })
+        .where('id = :id', { id: user.id })
+        .execute();
+      return user;
+    } else {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: "Sorry we couldn't find your account",
+        },
+        HttpStatus.NOT_FOUND,
       );
     }
   }

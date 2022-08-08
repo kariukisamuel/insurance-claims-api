@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { UserRegistrationModule } from './user-registration/user-registration.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRegistration } from './user-registration/entity/user-registration.entity';
-import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { Auth } from './auth/entity/auth.entity';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ClaimsModule } from './claims/claims.module';
+import { Claims } from './claims/entity/claims.entity';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       username: 'root',
       password: '',
       database: 'insurance-claims-app',
-      entities: [UserRegistration, Auth],
+      entities: [UserRegistration, Auth,Claims],
       synchronize: true,
     }),
     AuthModule,
@@ -26,6 +26,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
       ttl: 60,
       limit: 10,
     }),
+    ClaimsModule,
   ],
+
 })
 export class AppModule {}

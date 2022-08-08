@@ -11,6 +11,7 @@ export class ClaimsService {
       // return this.claimsRepository.save(createClaimsDTO)
     }
     getAll():Promise<Claims[]>{
+      // console.log(await this.claimsRepository.find())
       return this.claimsRepository.find()
     }
 }

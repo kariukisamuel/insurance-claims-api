@@ -6,6 +6,7 @@ import {
   ParseFilePipe,
   Post,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -20,6 +21,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ClaimsService } from './claims.service';
 import { CreateClaimsDTO } from './create-claims.dto';
 import { storage } from './storage.config';
@@ -41,6 +43,7 @@ export class ClaimsController {
   @ApiConsumes('multipart/form-data')
   @Post()
   @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -68,14 +71,15 @@ export class ClaimsController {
       'Get all claims, its a protected api that needs a bearer token',
   })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Claims have been successfully retrieved.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBearerAuth()
   @Get('all')
+  @UseGuards(JwtAuthGuard)
   getAllClaims(){
-    this.claimsService.getAll()
+    return this.claimsService.getAll()
   }
 
 
